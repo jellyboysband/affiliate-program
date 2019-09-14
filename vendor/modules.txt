@@ -1,0 +1,110 @@
+# github.com/PuerkitoBio/goquery v1.5.0
+github.com/PuerkitoBio/goquery
+# github.com/andybalholm/cascadia v1.0.0
+github.com/andybalholm/cascadia
+# github.com/antchfx/htmlquery v1.0.0
+github.com/antchfx/htmlquery
+# github.com/antchfx/xmlquery v1.0.0
+github.com/antchfx/xmlquery
+# github.com/antchfx/xpath v1.0.0
+github.com/antchfx/xpath
+# github.com/go-stack/stack v1.8.0
+github.com/go-stack/stack
+# github.com/gobwas/glob v0.2.3
+github.com/gobwas/glob
+github.com/gobwas/glob/compiler
+github.com/gobwas/glob/syntax
+github.com/gobwas/glob/match
+github.com/gobwas/glob/syntax/ast
+github.com/gobwas/glob/util/runes
+github.com/gobwas/glob/syntax/lexer
+github.com/gobwas/glob/util/strings
+# github.com/gocolly/colly v1.2.0
+github.com/gocolly/colly
+github.com/gocolly/colly/debug
+github.com/gocolly/colly/storage
+# github.com/golang/protobuf v1.3.1
+github.com/golang/protobuf/proto
+# github.com/golang/snappy v0.0.1
+github.com/golang/snappy
+# github.com/kennygrant/sanitize v1.2.4
+github.com/kennygrant/sanitize
+# github.com/pkg/errors v0.8.1
+github.com/pkg/errors
+# github.com/powerman/structlog v0.5.0
+github.com/powerman/structlog
+# github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca
+github.com/saintfish/chardet
+# github.com/streadway/amqp v0.0.0-20190827072141-edfb9018d271
+github.com/streadway/amqp
+# github.com/temoto/robotstxt v1.1.1
+github.com/temoto/robotstxt
+# github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c
+github.com/xdg/scram
+# github.com/xdg/stringprep v1.0.0
+github.com/xdg/stringprep
+# go.mongodb.org/mongo-driver v1.1.0
+go.mongodb.org/mongo-driver/bson
+go.mongodb.org/mongo-driver/bson/primitive
+go.mongodb.org/mongo-driver/mongo
+go.mongodb.org/mongo-driver/mongo/options
+go.mongodb.org/mongo-driver/bson/bsoncodec
+go.mongodb.org/mongo-driver/bson/bsonrw
+go.mongodb.org/mongo-driver/bson/bsontype
+go.mongodb.org/mongo-driver/x/bsonx/bsoncore
+go.mongodb.org/mongo-driver/event
+go.mongodb.org/mongo-driver/mongo/readconcern
+go.mongodb.org/mongo-driver/mongo/readpref
+go.mongodb.org/mongo-driver/mongo/writeconcern
+go.mongodb.org/mongo-driver/x/bsonx
+go.mongodb.org/mongo-driver/x/mongo/driver
+go.mongodb.org/mongo-driver/x/mongo/driver/auth
+go.mongodb.org/mongo-driver/x/mongo/driver/connstring
+go.mongodb.org/mongo-driver/x/mongo/driver/description
+go.mongodb.org/mongo-driver/x/mongo/driver/operation
+go.mongodb.org/mongo-driver/x/mongo/driver/session
+go.mongodb.org/mongo-driver/x/mongo/driver/topology
+go.mongodb.org/mongo-driver/x/mongo/driver/uuid
+go.mongodb.org/mongo-driver/tag
+go.mongodb.org/mongo-driver/x/mongo/driver/address
+go.mongodb.org/mongo-driver/x/mongo/driver/wiremessage
+go.mongodb.org/mongo-driver/x/mongo/driver/auth/internal/gssapi
+go.mongodb.org/mongo-driver/internal
+go.mongodb.org/mongo-driver/x/mongo/driver/dns
+go.mongodb.org/mongo-driver/version
+# golang.org/x/crypto v0.0.0-20190605123033-f99c8df09eb5
+golang.org/x/crypto/pbkdf2
+# golang.org/x/net v0.0.0-20190827160401-ba9fcec4b297
+golang.org/x/net/html
+golang.org/x/net/html/charset
+golang.org/x/net/html/atom
+golang.org/x/net/context
+# golang.org/x/sync v0.0.0-20190423024810-112230192c58
+golang.org/x/sync/semaphore
+# golang.org/x/text v0.3.2
+golang.org/x/text/encoding
+golang.org/x/text/encoding/charmap
+golang.org/x/text/encoding/htmlindex
+golang.org/x/text/transform
+golang.org/x/text/encoding/internal/identifier
+golang.org/x/text/encoding/internal
+golang.org/x/text/encoding/japanese
+golang.org/x/text/encoding/korean
+golang.org/x/text/encoding/simplifiedchinese
+golang.org/x/text/encoding/traditionalchinese
+golang.org/x/text/encoding/unicode
+golang.org/x/text/language
+golang.org/x/text/unicode/norm
+golang.org/x/text/internal/utf8internal
+golang.org/x/text/runes
+golang.org/x/text/internal/language
+golang.org/x/text/internal/language/compact
+golang.org/x/text/internal/tag
+# google.golang.org/appengine v1.6.2
+google.golang.org/appengine/urlfetch
+google.golang.org/appengine/internal
+google.golang.org/appengine/internal/urlfetch
+google.golang.org/appengine/internal/base
+google.golang.org/appengine/internal/datastore
+google.golang.org/appengine/internal/log
+google.golang.org/appengine/internal/remote_api
