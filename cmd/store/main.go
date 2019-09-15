@@ -2,126 +2,116 @@ package main
 
 import (
 	"context"
-	"encoding/json"
+	"flag"
 	"fmt"
+	"github.com/jellyboysband/eye/cmd/store/internal/app"
+	"github.com/jellyboysband/eye/cmd/store/internal/server"
+	"github.com/jellyboysband/eye/cmd/store/internal/store"
+	"github.com/pkg/errors"
 	"github.com/powerman/structlog"
 	"github.com/streadway/amqp"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"time"
+	"net"
+	"strconv"
 )
 
-type (
-	document struct {
-		Va            primitive.ObjectID `json:"_id"`
-		Title         string             `json:"title"`
-		ID            int                `json:"id"`
-		URL           string             `json:"url"`
-		TotalSales    int                `json:"total_sales"`
-		RatingProduct string             `json:"rating_product"`
-		TotalComment  int                `json:"total_comment"`
-		Discount      float64            `json:"discount"`
-		Max           price              `json:"max"`
-		Min           price              `json:"min"`
-		Shop          shop               `json:"shop"`
-	}
+var (
+	log = structlog.New()
 
-	price struct {
-		Currency string  `json:"currency"`
-		Cost     float64 `json:"cost"`
-	}
+	cfg struct {
+		dbPass     string
+		dbUsername string
+		dbHost     string
+		dbPort     int
 
-	shop struct {
-		ID           int    `json:"id"`
-		Name         string `json:"name"`
-		Followers    int    `json:"followers"`
-		PositiveRate string `json:"positive_rate"`
+		InsertQueueName string
+		SendQueueName   string
+		appID           string
+		expectedAppID   string
+		rabbitPass      string
+		rabbitUser      string
+		rabbitHost      string
+		rabbitPort      int
 	}
 )
+
+func init() {
+	flag.StringVar(&cfg.dbPass, "db.pass", "mongo", "DB password.")
+	flag.StringVar(&cfg.dbUsername, "db.username", "mongo", "DB username.")
+	flag.StringVar(&cfg.dbHost, "db.host", "localhost", "DB host.")
+	flag.IntVar(&cfg.dbPort, "db.port", 27017, "DB port.")
+
+	flag.StringVar(&cfg.appID, "app.id", "parser", "Application ID")
+	flag.StringVar(&cfg.expectedAppID, "expected.app.id", "parser", "Expected application ID")
+
+	flag.StringVar(&cfg.InsertQueueName, "insert.queue.name", "filtered_products", "Insert queue name.")
+	flag.StringVar(&cfg.SendQueueName, "send.queue.name", "ready_products", "Send queue name.")
+	flag.StringVar(&cfg.rabbitPass, "rabbit.pass", "rabbitmq", "RabbitMQ password.")
+	flag.StringVar(&cfg.rabbitUser, "rabbit.user", "rabbitmq", "RabbitMQ user.")
+	flag.StringVar(&cfg.rabbitHost, "rabbit.host", "localhost", "RabbitMQ host.")
+	flag.IntVar(&cfg.rabbitPort, "rabbit.port", 5672, "RabbitMQ port.")
+
+	flag.Parse()
+}
 
 func main() {
-	log := structlog.New()
+	url := fmt.Sprintf("amqp://%s:%s@%s:%d",
+		cfg.rabbitUser,
+		cfg.rabbitPass,
+		cfg.rabbitHost,
+		cfg.rabbitPort,
+	)
 
-	conn, err := amqp.Dial("amqp://rabbitmq:rabbitmq@localhost:5672/")
+	conn, err := amqp.Dial(url)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer log.WarnIfFail(conn.Close)
 
-	ch, err := conn.Channel()
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer log.WarnIfFail(ch.Close)
+	opts := options.Client().ApplyURI("mongodb://" + net.JoinHostPort(cfg.dbHost, strconv.Itoa(cfg.dbPort))).
+		SetAuth(options.Credential{
+			Username: cfg.dbUsername,
+			Password: cfg.dbPass,
+		})
 
-	q, err := ch.QueueDeclare(
-		"documents_ali", // name
-		false,           // durable
-		false,           // delete when usused
-		false,           // exclusive
-		false,           // no-wait
-		nil,             // arguments
-	)
-
-	msgs, err := ch.Consume(
-		q.Name, // queue
-		"",     // consumer
-		true,   // auto-ack
-		false,  // exclusive
-		false,  // no-local
-		false,  // no-wait
-		nil,    // args
-	)
-	cread := options.Credential{
-		Username: "mongo",
-		Password: "mongo",
-	}
-	opts := options.Client().ApplyURI("mongodb://localhost:27017").SetAuth(cread)
 	// Connect to MongoDB
 	client, err := mongo.Connect(context.TODO(), opts)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Check the connection
-	err = client.Ping(context.TODO(), nil)
+	log.Info("Store started")
+	log.Fatal(run(conn, client))
+}
+
+func run(conn *amqp.Connection, client *mongo.Client) error {
+	ch, err := conn.Channel()
 	if err != nil {
-		log.Fatal(err)
+		return errors.Wrap(err, "failed to get channel rabbit")
+	}
+	defer log.WarnIfFail(ch.Close)
+
+	queue, err := ch.QueueDeclare(cfg.SendQueueName, false, false, false, false, nil)
+	if err != nil {
+		return errors.Wrap(err, "failed to declare queue")
 	}
 
-	fmt.Println("Connected to MongoDB!")
-	collection := client.Database("test").Collection("test")
-
-	for d := range msgs {
-		var val document
-		err := json.Unmarshal(d.Body, &val)
-		if err != nil {
-			log.Fatal(err)
-		}
-		val.Va = primitive.NewObjectIDFromTimestamp(time.Now())
-		insertResult, err := collection.InsertOne(context.TODO(), val)
-		if err != nil {
-			log.Fatal(err)
-		}
-		log.Println(insertResult)
-
-		var val2 document
-		f := bson.D{
-			{"id", bson.D{{"$gte", val.ID}}},
-		}
-		err = collection.FindOne(context.TODO(), f).Decode(&val2)
-		log.Println(val2)
-		log.Println(err)
-
-		var arr []document
-		filter := bson.M{}
-		c, err := collection.Find(context.TODO(), filter)
-		if err != nil {
-			log.Fatal(err)
-		}
-		err = c.All(context.TODO(), &arr)
-		log.Println(arr)
+	msgs, err := ch.Consume(
+		cfg.InsertQueueName, // queue
+		"",                  // consumer
+		true,                // auto-ack
+		false,               // exclusive
+		false,               // no-local
+		false,               // no-wait
+		nil,                 // args
+	)
+	if err != nil {
+		return errors.Wrapf(err, "failed to consume")
 	}
+
+	storage := store.New(client)
+	application := app.New(storage)
+	s := server.New(cfg.appID, application, cfg.expectedAppID)
+	return s.Listen(msgs, ch, queue.Name, log)
 }

@@ -62,7 +62,7 @@ func (s *store) Save(ctx context.Context, product app.ArgSaveProduct) (*app.Prod
 		return nil, errors.Wrap(err, "failed to insert document")
 	}
 
-	return s.Product(ctx, document.Id.String())
+	return s.Product(ctx, document.Id.Hex())
 }
 
 func (s *store) Product(ctx context.Context, id string) (*app.Product, error) {

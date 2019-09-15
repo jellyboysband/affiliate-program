@@ -49,13 +49,14 @@ func New(appID string, app app.App, expectedAppID string) *Server {
 	return &Server{appID, app, expectedAppID}
 }
 
-const timeoutSaveProduct = time.Second
+const timeoutSaveProduct = time.Second * 100
 
 func (s *Server) Listen(insertProducts <-chan amqp.Delivery, sendProducts *amqp.Channel, queueName string, log *structlog.Logger) error {
 
 	// TODO refactor
 	for val := range insertProducts {
 		// TODO Добавить дополнительные проверки
+		log.Println(string(val.Body))
 		switch {
 		case val.AppId != s.expectedAppID:
 			log.Warn("unknown source", "appID:", val.AppId)
