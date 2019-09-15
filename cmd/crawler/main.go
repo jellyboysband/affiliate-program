@@ -51,7 +51,7 @@ func main() {
 		cfg.rabbitHost,
 		cfg.rabbitPort,
 	)
-
+	log.Println(url)
 	conn, err := amqp.Dial(url)
 	if err != nil {
 		log.Fatal(err)

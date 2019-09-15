@@ -24,3 +24,14 @@ services:
     ports:
       - "15672:15672"
       - "5672:5672"
+
+  crawler:
+    build:
+      context: .
+      dockerfile: cmd/crawler/Dockerfile
+    image: crawler
+    container_name: crawler
+    restart: always
+    entrypoint: /crawler
+    command:
+      - "--rabbit.host=rabbit"
