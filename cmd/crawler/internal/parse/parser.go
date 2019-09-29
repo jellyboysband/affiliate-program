@@ -7,6 +7,7 @@ import (
 	"github.com/jellyboysband/eye/cmd/crawler/internal/app"
 	"github.com/powerman/structlog"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -85,7 +86,8 @@ func convert(page *Page) app.Document {
 		Id:            page.PageModule.ProductID,
 		URL:           page.PageModule.URL,
 		TotalSales:    page.TitleModule.TradeCount,
-		RatingProduct: page.TitleModule.Rating.StarSTR,
+		RatingProduct: mustFloat(page.TitleModule.Rating.StarSTR),
+		Images:        page.ImageModule.ImagePathList,
 		TotalComment:  page.TitleModule.Rating.CountFeedback,
 		Discount:      page.PriceModule.Discount,
 		Max: app.Price{
@@ -100,7 +102,15 @@ func convert(page *Page) app.Document {
 			ID:           page.StoreModule.StoreID,
 			Name:         page.StoreModule.StoreName,
 			Followers:    page.StoreModule.FollowingNumber,
-			PositiveRate: page.StoreModule.PositiveRateSTR,
+			PositiveRate: mustFloat(page.StoreModule.PositiveRateSTR[:len(page.StoreModule.PositiveRateSTR)-2]), // TODO закомментировать
 		},
 	}
+}
+
+func mustFloat(s string) float64 {
+	f, err := strconv.ParseFloat(s, 64)
+	if err != nil {
+		panic(fmt.Errorf("%w:%s", err, "failed to parse seller rate"))
+	}
+	return f
 }

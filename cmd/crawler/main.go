@@ -20,6 +20,7 @@ var (
 		domain    string
 		startID   int
 		queueName string
+		rateMin   float64
 
 		appID      string
 		rabbitPass string
@@ -40,6 +41,8 @@ func init() {
 	flag.StringVar(&cfg.rabbitUser, "rabbit.user", "rabbitmq", "RabbitMQ user.")
 	flag.StringVar(&cfg.rabbitHost, "rabbit.host", "localhost", "RabbitMQ host.")
 	flag.IntVar(&cfg.rabbitPort, "rabbit.port", 5672, "RabbitMQ port.")
+
+	flag.Float64Var(&cfg.rateMin, "rate-min", 0.5, "Min our rate for send in queue.")
 
 	flag.Parse()
 }
@@ -75,7 +78,7 @@ func run(conn *amqp.Connection) error {
 
 	f := filter.New(ch, queue, cfg.appID)
 	collector := colly.NewCollector(colly.AllowedDomains(cfg.domain))
-	application := app.New(f)
+	application := app.New(f, cfg.rateMin)
 
 	chErr := make(chan error)
 	go parse.Run(collector, log, cfg.startID, application, chErr)

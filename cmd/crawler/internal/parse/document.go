@@ -8,6 +8,7 @@ type (
 		RedirectModule RedirectModule `json:"redirectModule"`
 		ActionModule   ActionModule   `json:"actionModule"`
 		PageModule     PageModule     `json:"pageModule"`
+		ImageModule    ImageModule    `json:"imageModule"`
 	}
 
 	TitleModule struct {
@@ -42,6 +43,10 @@ type (
 	PageModule struct {
 		URL       string `json:"itemDetailUrl"`
 		ProductID int    `json:"productId"`
+	}
+
+	ImageModule struct {
+		ImagePathList []string `json:"imagePathList"`
 	}
 )
 

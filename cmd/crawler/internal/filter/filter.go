@@ -5,6 +5,7 @@ import (
 	"github.com/jellyboysband/eye/cmd/crawler/internal/app"
 	"github.com/pkg/errors"
 	"github.com/streadway/amqp"
+	"log"
 )
 
 const (
@@ -19,16 +20,18 @@ type (
 	}
 
 	document struct {
-		Title         string  `json:"title"`
-		ID            int     `json:"id"`
-		URL           string  `json:"url"`
-		TotalSales    int     `json:"total_sales"`
-		RatingProduct string  `json:"rating_product"`
-		TotalComment  int     `json:"total_comment"`
-		Discount      float64 `json:"discount"`
-		Max           price   `json:"max"`
-		Min           price   `json:"min"`
-		Shop          shop    `json:"shop"`
+		Title         string   `json:"title"`
+		OurRating     float64  `json:"our_rating"`
+		ID            int      `json:"id"`
+		URL           string   `json:"url"`
+		TotalSales    int      `json:"total_sales"`
+		RatingProduct float64  `json:"rating_product"`
+		TotalComment  int      `json:"total_comment"`
+		Images        []string `json:"images"`
+		Discount      float64  `json:"discount"`
+		Max           price    `json:"max"`
+		Min           price    `json:"min"`
+		Shop          shop     `json:"shop"`
 	}
 
 	price struct {
@@ -37,10 +40,10 @@ type (
 	}
 
 	shop struct {
-		ID           int    `json:"id"`
-		Name         string `json:"name"`
-		Followers    int    `json:"followers"`
-		PositiveRate string `json:"positive_rate"`
+		ID           int     `json:"id"`
+		Name         string  `json:"name"`
+		Followers    int     `json:"followers"`
+		PositiveRate float64 `json:"positive_rate"`
 	}
 )
 
@@ -48,12 +51,13 @@ func New(ch *amqp.Channel, queue amqp.Queue, appID string) app.Store {
 	return &store{Name: queue.Name, ch: ch, appID: appID}
 }
 
-func (s *store) Send(d app.Document) error {
-	js, err := json.Marshal(convertDocument(d))
+func (s *store) Send(d app.Document, rate float64) error {
+	js, err := json.Marshal(convertDocument(d, rate))
 	if err != nil {
 		return errors.Wrap(err, "failed to convert json")
 	}
 
+	log.Println(string(js))
 	// TODO дописать publishing
 	publishing := amqp.Publishing{
 		AppId:       s.appID,
@@ -69,14 +73,16 @@ func (s *store) Send(d app.Document) error {
 	return nil
 }
 
-func convertDocument(d app.Document) document {
+func convertDocument(d app.Document, ourRating float64) document {
 	return document{
 		Title:         d.Title,
+		OurRating:     ourRating,
 		ID:            d.Id,
 		URL:           d.URL,
 		TotalSales:    d.TotalSales,
 		RatingProduct: d.RatingProduct,
 		TotalComment:  d.TotalComment,
+		Images:        d.Images,
 		Discount:      d.Discount,
 		Max: price{
 			Currency: d.Max.Currency,
