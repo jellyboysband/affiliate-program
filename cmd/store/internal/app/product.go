@@ -5,10 +5,12 @@ type (
 		Id            string
 		AliID         int
 		Rating        float64
+		Images        []string
+		OurRating     float64
 		URL           string
 		Title         string
 		TotalSales    int
-		RatingProduct string
+		RatingProduct float64
 		TotalComment  int
 		Discount      float64
 		Max           Price
@@ -29,12 +31,14 @@ type (
 	}
 
 	ArgSaveProduct struct {
+		Images        []string
+		OurRating     float64
 		AliID         int
 		Rating        float64
 		URL           string
 		Title         string
 		TotalSales    int
-		RatingProduct string
+		RatingProduct float64
 		TotalComment  int
 		Discount      float64
 		Max           Price

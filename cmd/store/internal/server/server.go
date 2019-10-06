@@ -7,7 +7,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/powerman/structlog"
 	"github.com/streadway/amqp"
-	"strconv"
 	"time"
 )
 
@@ -19,17 +18,19 @@ type (
 	}
 
 	document struct {
-		StoreID       string  `json:"store_id"`
-		Title         string  `json:"title"`
-		ID            int     `json:"id"`
-		URL           string  `json:"url"`
-		TotalSales    int     `json:"total_sales"`
-		RatingProduct string  `json:"rating_product"`
-		TotalComment  int     `json:"total_comment"`
-		Discount      float64 `json:"discount"`
-		Max           price   `json:"max"`
-		Min           price   `json:"min"`
-		Shop          shop    `json:"shop"`
+		Images        []string `json:"images"`
+		OurRating     float64  `json:"our_rating"`
+		StoreID       string   `json:"store_id"`
+		Title         string   `json:"title"`
+		ID            int      `json:"id"`
+		URL           string   `json:"url"`
+		TotalSales    int      `json:"total_sales"`
+		RatingProduct float64  `json:"rating_product"`
+		TotalComment  int      `json:"total_comment"`
+		Discount      float64  `json:"discount"`
+		Max           price    `json:"max"`
+		Min           price    `json:"min"`
+		Shop          shop     `json:"shop"`
 	}
 
 	price struct {
@@ -75,13 +76,7 @@ func (s *Server) Listen(insertProducts <-chan amqp.Delivery, sendProducts *amqp.
 		}
 
 		ctx, cancel := context.WithTimeout(context.Background(), timeoutSaveProduct)
-		saveInfo := documentToProduct(d, &err)
-		if err != nil {
-			log.Warn(errors.Wrap(err, "failed to convert document"), "rating:", d.RatingProduct)
-			continue
-		}
-
-		product, err := s.app.Save(ctx, saveInfo)
+		product, err := s.app.Save(ctx, documentToProduct(d))
 		if err != nil {
 			log.Warn(errors.Wrap(err, "failed to save product"))
 			continue
@@ -139,10 +134,12 @@ func productToDocument(product *app.Product) document {
 	}
 }
 
-func documentToProduct(doc *document, err *error) app.ArgSaveProduct {
+func documentToProduct(doc *document) app.ArgSaveProduct {
 	return app.ArgSaveProduct{
 		AliID:         doc.ID,
-		Rating:        strToFloat64(doc.RatingProduct, err),
+		OurRating:     doc.OurRating,
+		Rating:        doc.RatingProduct,
+		Images:        doc.Images,
 		URL:           doc.URL,
 		Title:         doc.Title,
 		TotalSales:    doc.TotalSales,
@@ -164,10 +161,4 @@ func documentToProduct(doc *document, err *error) app.ArgSaveProduct {
 			PositiveRate: doc.Shop.PositiveRate,
 		},
 	}
-}
-
-func strToFloat64(s string, err *error) float64 {
-	var val float64
-	val, *err = strconv.ParseFloat(s, 64)
-	return val
 }

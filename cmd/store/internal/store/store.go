@@ -22,12 +22,14 @@ type (
 
 	product struct {
 		Id            primitive.ObjectID `bson:"_id"`
+		Images        []string           `bson:"images"`
+		OurRating     float64            `bson:"our_rating"`
 		AliID         int                `bson:"ali_id"`
 		Rating        float64            `bson:"rating"`
 		URL           string             `bson:"url"`
 		Title         string             `bson:"title"`
 		TotalSales    int                `bson:"total_sales"`
-		RatingProduct string             `bson:"rating_product"`
+		RatingProduct float64            `bson:"rating_product"`
 		TotalComment  int                `bson:"total_comment"`
 		Discount      float64            `bson:"discount"`
 		Max           price              `bson:"max"`
@@ -111,6 +113,8 @@ func convertList(products []product) []app.Product {
 
 func convertToAppFormat(document *product) *app.Product {
 	return &app.Product{
+		OurRating:     document.OurRating,
+		Images:        document.Images,
 		Id:            document.Id.String(),
 		AliID:         document.AliID,
 		URL:           document.URL,
@@ -138,6 +142,8 @@ func convertToAppFormat(document *product) *app.Product {
 
 func convertToMONGO(appFormat app.ArgSaveProduct) product {
 	return product{
+		Images:        appFormat.Images,
+		OurRating:     appFormat.OurRating,
 		AliID:         appFormat.AliID,
 		Rating:        appFormat.Rating,
 		URL:           appFormat.URL,
