@@ -110,6 +110,8 @@ const (
 func productToDocument(product *app.Product) document {
 	return document{
 		StoreID:       product.Id,
+		Images:        product.Images,
+		OurRating:     product.OurRating,
 		Title:         product.Title,
 		ID:            product.AliID,
 		URL:           product.URL,
