@@ -42,7 +42,7 @@ type (
 		ID           int    `json:"id"`
 		Name         string `json:"name"`
 		Followers    int    `json:"followers"`
-		PositiveRate string `json:"positive_rate"`
+		PositiveRate float64 `json:"positive_rate"`
 	}
 )
 

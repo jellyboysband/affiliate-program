@@ -43,10 +43,10 @@ type (
 	}
 
 	shop struct {
-		ID           int    `bson:"id"`
-		Name         string `bson:"name"`
-		Followers    int    `bson:"followers"`
-		PositiveRate string `bson:"positive_rate"`
+		ID           int     `bson:"id"`
+		Name         string  `bson:"name"`
+		Followers    int     `bson:"followers"`
+		PositiveRate float64 `bson:"positive_rate"`
 	}
 )
 

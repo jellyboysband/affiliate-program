@@ -27,7 +27,7 @@ type (
 		ID           int
 		Name         string
 		Followers    int
-		PositiveRate string
+		PositiveRate float64
 	}
 
 	ArgSaveProduct struct {
