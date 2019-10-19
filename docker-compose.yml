@@ -35,3 +35,16 @@ services:
     entrypoint: /crawler
     command:
       - "--rabbit.host=rabbit"
+      - "--rate-min=0.1"
+
+  store:
+    build:
+      context: .
+      dockerfile: cmd/store/Dockerfile
+    image: store
+    container_name: store
+    restart: always
+    entrypoint: /store
+    command:
+      - "--rabbit.host=rabbit"
+      - "--expected.app.id=affilateQ"

@@ -72,7 +72,6 @@ func (p *Parser) parserALI(element *colly.HTMLElement) {
 	if !valid(&page) {
 		return
 	}
-
 	p.log.WarnIfFail(func() error { return p.app.Save(convert(&page)) })
 }
 

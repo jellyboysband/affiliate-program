@@ -42,7 +42,7 @@ func init() {
 	flag.StringVar(&cfg.rabbitHost, "rabbit.host", "localhost", "RabbitMQ host.")
 	flag.IntVar(&cfg.rabbitPort, "rabbit.port", 5672, "RabbitMQ port.")
 
-	flag.Float64Var(&cfg.rateMin, "rate-min", 0.5, "Min our rate for send in queue.")
+	flag.Float64Var(&cfg.rateMin, "rate-min", 0.05, "Min our rate for send in queue.")
 
 	flag.Parse()
 }
