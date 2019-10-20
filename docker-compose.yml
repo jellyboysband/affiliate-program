@@ -35,7 +35,7 @@ services:
     entrypoint: /crawler
     command:
       - "--rabbit.host=rabbit"
-      - "--rate-min=0.1"
+      - "--rate-min=0"
 
   store:
     build:
@@ -48,3 +48,4 @@ services:
     command:
       - "--rabbit.host=rabbit"
       - "--expected.app.id=affilateQ"
+      - "--db.host=mongo"
