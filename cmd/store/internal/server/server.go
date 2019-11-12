@@ -90,7 +90,7 @@ func (s *Server) Listen(insertProducts <-chan amqp.Delivery, sendProducts *amqp.
 		}
 
 		// TODO дописать publishing
-		publishing := amqp.Publishing{AppId: s.appID, ContentType: contentType, Body: js}
+		publishing := amqp.Publishing{AppId: s.appID, ContentType: contentType, Body: js, DeliveryMode:2 }
 		err = sendProducts.Publish("", queueName, false, false, publishing)
 		if err != nil {
 			log.Warn(errors.Wrap(err, "failed to publish document"))

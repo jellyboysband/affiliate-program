@@ -63,6 +63,7 @@ func (s *store) Send(d app.Document, rate float64) error {
 		AppId:       s.appID,
 		ContentType: contentType,
 		Body:        js,
+		DeliveryMode:2,
 	}
 
 	err = s.ch.Publish("", s.Name, false, false, publishing)
