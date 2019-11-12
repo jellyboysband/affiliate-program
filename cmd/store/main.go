@@ -43,7 +43,7 @@ func init() {
 	flag.IntVar(&cfg.dbPort, "db.port", 27017, "DB port.")
 
 	flag.StringVar(&cfg.appID, "app.id", "parser", "Application ID")
-	flag.StringVar(&cfg.expectedAppID, "expected.app.id", "parser", "Expected application ID")
+	flag.StringVar(&cfg.expectedAppID, "expected.app.id", "affilateQ", "Expected application ID")
 
 	flag.StringVar(&cfg.InsertQueueName, "insert.queue.name", "filtered_products", "Insert queue name.")
 	flag.StringVar(&cfg.SendQueueName, "send.queue.name", "ready_products", "Send queue name.")

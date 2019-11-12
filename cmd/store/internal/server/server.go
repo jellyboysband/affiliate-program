@@ -42,7 +42,7 @@ type (
 		ID           int    `json:"id"`
 		Name         string `json:"name"`
 		Followers    int    `json:"followers"`
-		PositiveRate string `json:"positive_rate"`
+		PositiveRate float64 `json:"positive_rate"`
 	}
 )
 
@@ -57,7 +57,6 @@ func (s *Server) Listen(insertProducts <-chan amqp.Delivery, sendProducts *amqp.
 	// TODO refactor
 	for val := range insertProducts {
 		// TODO Добавить дополнительные проверки
-		log.Println(string(val.Body))
 		switch {
 		case val.AppId != s.expectedAppID:
 			log.Warn("unknown source", "appID:", val.AppId)
