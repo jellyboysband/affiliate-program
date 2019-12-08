@@ -6,6 +6,7 @@ import (
 	"github.com/gocolly/colly"
 	"github.com/jellyboysband/eye/cmd/crawler/internal/app"
 	"github.com/powerman/structlog"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -72,20 +73,37 @@ func (p *Parser) parserALI(element *colly.HTMLElement) {
 	if !valid(&page) {
 		return
 	}
-	p.log.WarnIfFail(func() error { return p.app.Save(convert(&page)) })
+
+	convertD, err := convert(&page)
+	if err != nil {
+		log.Println(fmt.Errorf("failer convert document: %w", err))
+		return
+	}
+
+	p.log.WarnIfFail(func() error { return p.app.Save(convertD) })
 }
 
 func valid(page *Page) bool {
 	return page.RedirectModule.Code == Code && page.ActionModule.ItemStatus == 0 && page.ActionModule.TotalAvailQuantity > 0
 }
 
-func convert(page *Page) app.Document {
+func convert(page *Page) (app.Document, error) {
+	f, err := strconv.ParseFloat(page.TitleModule.Rating.StarSTR, 64)
+	if err != nil {
+		return app.Document{}, fmt.Errorf("%w:%s", err, "failed to parse seller rate")
+	}
+
+	positiveRate, err := strconv.ParseFloat(page.StoreModule.PositiveRateSTR[:len(page.StoreModule.PositiveRateSTR)-2], 64)
+	if err != nil {
+		return app.Document{}, fmt.Errorf("%w:%s", err, "failed to parse positive rate")
+	}
+
 	return app.Document{
 		Title:         page.TitleModule.Subject,
 		Id:            page.PageModule.ProductID,
 		URL:           page.PageModule.URL,
 		TotalSales:    page.TitleModule.TradeCount,
-		RatingProduct: mustFloat(page.TitleModule.Rating.StarSTR),
+		RatingProduct: f,
 		Images:        page.ImageModule.ImagePathList,
 		TotalComment:  page.TitleModule.Rating.CountFeedback,
 		Discount:      page.PriceModule.Discount,
@@ -101,15 +119,7 @@ func convert(page *Page) app.Document {
 			ID:           page.StoreModule.StoreID,
 			Name:         page.StoreModule.StoreName,
 			Followers:    page.StoreModule.FollowingNumber,
-			PositiveRate: mustFloat(page.StoreModule.PositiveRateSTR[:len(page.StoreModule.PositiveRateSTR)-2]), // TODO закомментировать
+			PositiveRate: positiveRate, // TODO закомментировать
 		},
-	}
-}
-
-func mustFloat(s string) float64 {
-	f, err := strconv.ParseFloat(s, 64)
-	if err != nil {
-		panic(fmt.Errorf("%w:%s", err, "failed to parse seller rate"))
-	}
-	return f
+	}, nil
 }
