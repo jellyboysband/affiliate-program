@@ -32,7 +32,7 @@ var (
 
 func init() {
 	flag.StringVar(&cfg.domain, "domain", "ru.aliexpress.com", "Main domain for parse.")
-	flag.IntVar(&cfg.startID, "startID", 33035919711, "First parsing product.")
+	flag.IntVar(&cfg.startID, "startID", 33035919711+380000, "First parsing product.")
 
 	flag.StringVar(&cfg.appID, "app.id", "parser", "Application ID")
 

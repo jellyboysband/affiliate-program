@@ -93,11 +93,6 @@ func convert(page *Page) (app.Document, error) {
 		return app.Document{}, fmt.Errorf("%w:%s", err, "failed to parse seller rate")
 	}
 
-	positiveRate, err := strconv.ParseFloat(page.StoreModule.PositiveRateSTR[:len(page.StoreModule.PositiveRateSTR)-2], 64)
-	if err != nil {
-		return app.Document{}, fmt.Errorf("%w:%s", err, "failed to parse positive rate")
-	}
-
 	return app.Document{
 		Title:         page.TitleModule.Subject,
 		Id:            page.PageModule.ProductID,
@@ -119,7 +114,16 @@ func convert(page *Page) (app.Document, error) {
 			ID:           page.StoreModule.StoreID,
 			Name:         page.StoreModule.StoreName,
 			Followers:    page.StoreModule.FollowingNumber,
-			PositiveRate: positiveRate, // TODO закомментировать
+			PositiveRate: parseRating(page.StoreModule.PositiveRateSTR),
 		},
 	}, nil
+}
+
+func parseRating(str string) float64 {
+	positiveRate, err := strconv.ParseFloat(str, 64)
+	if err != nil {
+		positiveRate, err = strconv.ParseFloat(strings.TrimRight(str, "%"), 64)
+	}
+
+	return positiveRate
 }
